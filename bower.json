@@ -5,7 +5,7 @@
     "Manuel Ihl <manuel.ihl@ambersive.com>"
   ],
   "description": "AngularJS (1.5) datalist module for an easy way to display a list of data.",
-  "main": "build/menu.js",
+  "main": "build/list.js",
   "keywords": [
     "AngularJS",
     "Angular",
