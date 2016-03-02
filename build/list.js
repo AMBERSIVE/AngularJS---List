@@ -174,9 +174,56 @@
                      */
 
                     datalist.checkActionForMultiple = function(action){
-                        if(action.allowMultiple === true && datalist.selectedItems.length > 0){
+
+                        if(action.multiple === undefined){
+                            return;
+                        }
+
+                        if(angular.isObject(action.multiple)){
+
+                            var show = (action.multiple.show || false),
+                                only = (action.multiple.only || false);
+
+                            if(show === true){
+                                return action;
+                            }
+
+                            if(show === false && datalist.selectedItems.length > 0){
+                                return action;
+                            }
+
+                        } else {
+
+                            var available = (action.multiple || false);
+
+                            if(available === true && datalist.selectedItems.length > 0){
+                                return action;
+                            }
+
+                        }
+
+                    };
+
+                    /***
+                     * Filter function to show/hide a function for a single action call
+                     * @param action
+                     * @returns {*}
+                     */
+
+                    datalist.checkActionForSingle = function(action){
+
+                        var onlyMultiple = false;
+
+                        if(action.multiple !== undefined){
+                            if(angular.isObject(action.multiple)){
+                                onlyMultiple = (action.multiple.only || false);
+                            }
+                        }
+
+                        if(onlyMultiple === false) {
                             return action;
                         }
+
                     };
 
                     /***
@@ -184,9 +231,9 @@
                      * @returns undefined
                      */
 
-                    datalist.menu = function(){
+                    datalist.getMenu = function(){
                         if(settings.actions !== undefined){
-                            datalist.actions = angular.copy(settings.actions);
+                            datalist.actions = angular.copy(settings.actions).filter(datalist.checkActionForSingle);
                             datalist.actionsMultiple = angular.copy(settings.actions).filter(datalist.checkActionForMultiple);
                         }
                     };
@@ -205,7 +252,7 @@
                          * Menus
                          */
 
-                        datalist.menu();
+                        datalist.getMenu();
 
                         /**
                          * Get Template
@@ -347,7 +394,7 @@
 
                         datalist.selectedItems = [];
                         datalist.selectAll = false;
-                        datalist.menu();
+                        datalist.getMenu();
 
                         if(datalist.actionLoading === true){
                             return;
@@ -416,6 +463,30 @@
                                 }
                             );
                         }
+                        else if(action.fn !== undefined){
+
+                            action.fn(row.id,row).then(
+                                function successHandler(result,refresh){
+                                    if(action.successFn !== undefined && angular.isFunction(action.successFn)){
+                                        action.successFn(result,$element);
+                                    }
+
+                                    if(refresh === true){
+                                        datalist.getData(datalist.currentPage);
+                                    }
+
+                                    removeIdFromActionItem(row.id);
+                                },
+                                function errorHandler(errorResult){
+                                    if(action.errorFn !== undefined && angular.isFunction(action.errorFn)){
+                                        action.errorFn(errorResult,$element);
+                                    }
+
+                                    removeIdFromActionItem(row.id);
+                                }
+                            );
+
+                        }
 
                     };
 
@@ -439,35 +510,96 @@
                         datalist.actionLoading = true;
 
                         var actionClass = {},
+                            callFn      = null,
                             counter     = 0,
-                            counterFn   = function(){
+                            counterFn   = function(response,single){
+
+                                if(single === undefined){ single = false; }
+
+                                if(single === true){
+                                    datalist.actionLoading = false;
+                                    return;
+                                }
+
                                 counter++;
 
                                 if(counter === entries.length){
                                     datalist.actionLoading = false;
                                 }
-                            };
+                            },
+                            singleCall = false;
 
                         if(action.apiMethod !== undefined){
 
                             actionClass = DB(datalist.api);
 
-                            entries.forEach(function(entry,index){
-
+                            callFn = function(entry){
                                 actionClass[action.apiMethod](entry).then(
-                                    function(result,refresh){
+                                    function (result, refresh) {
 
-                                        counterFn();
+                                        counterFn(result,singleCall);
 
                                     },
-                                    function(errorResult){
+                                    function (errorResult) {
 
-                                        counterFn();
+                                        counterFn(errorResult,singleCall);
 
                                     }
                                 );
+                            };
 
-                            });
+                            if(action.multiple !== undefined && action.multiple.single === true){
+
+                                singleCall = true;
+                                callFn(0);
+
+                            } else {
+                                entries.forEach(function (entry, index) {
+
+                                    actionClass[action.apiMethod](entry).then(
+                                        function (result, refresh) {
+
+                                            counterFn(result);
+
+                                        },
+                                        function (errorResult) {
+
+                                            counterFn(errorResult);
+
+                                        }
+                                    );
+
+                                });
+                            }
+
+                        }
+                        else if(action.fn !== undefined){
+
+                            callFn = function(entry){
+                                action.fn(entry).then(
+                                    function successHandler(result,refresh){
+                                        counterFn(result,singleCall);
+                                    },
+                                    function errorHandler(errorResult){
+                                        counterFn(errorResult,singleCall);
+                                    }
+                                );
+                            };
+
+                            if(action.multiple !== undefined && action.multiple.single === true){
+
+                                singleCall = true;
+                                callFn(0);
+
+                            } else {
+
+                                entries.forEach(function(entry,index){
+
+                                    callFn(entry);
+
+                                });
+
+                            }
 
                         }
 
@@ -495,7 +627,7 @@
                             datalist.allSelected = false;
                         }
 
-                        datalist.menu();
+                        datalist.getMenu();
 
                     };
 
@@ -523,7 +655,7 @@
                         };
 
                         datalist.data.filter(setter);
-                        datalist.menu();
+                        datalist.getMenu();
 
                     };
 

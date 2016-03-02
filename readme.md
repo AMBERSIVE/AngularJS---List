@@ -3,7 +3,7 @@
 An AngularJS (1.5) service for displaying data (json-format).
 
 ### Version
-0.0.1.0
+0.0.1.1
 
 ### Installation
 
@@ -67,13 +67,103 @@ To configurate the controls and other things you can define a settings objects.
 ```sh
 $scope.settings = {
     actions:[
-        {'label':'Delete',apiMethod:'delete',allowMultiple:true}
+        {'label':'Delete',apiMethod:'delete',multiple:true}
     ]
 };
 ```
 
-As you can see here, the settings objects has an attribute called actions, which affects the controls.
-If you set the "allowMultiple" to true the action is also available for multiple entries at the same time.
+##### Actions
+
+As you can see here, the settings object above has an attribute called "actions", which affects the controls of an single entry or the global datalist controls.
+
+Currently there are differnt ways to define an action:
+
+```sh
+$scope.settings = {
+    actions:[
+         {'label':'Delete',apiMethod:'delete',multiple:true}
+    ]
+};
+```
+
+You can also define a custom function.
+
+```sh
+$scope.settings = {
+    actions:[
+        {
+            'label':'Say me the ID',
+            fn:function(id,row){
+                var deferred = $q.defer();
+
+                if(id !== undefined){
+                    alert('This entry has the ID:'+id);
+                    deferred.resolve();
+                }
+
+                return deferred.promise;
+            },
+            multiple:false
+        }
+    ]
+};
+```
+
+If you want to restrict the function only to the global datalist functions you can do that via the multiple attribute of an action.
+
+```sh
+$scope.settings = {
+    actions:[
+        {
+           'label':'Print',
+            fn:function(id,row){
+                var deferred = $q.defer();
+
+                if(id !== undefined){
+                    window.print();
+                    deferred.resolve();
+                }
+
+                return deferred.promise;
+            },
+            multiple:{
+                only:true,
+                show:true,
+                single:true
+            }
+        }
+    ]
+};
+```
+
+Every action is available in the global datalist functionslist, if you define it in the action. This is possible in two ways via the attribute "multiple"
+
+```sh
+$scope.settings = {
+    actions:[
+         {'label':'Delete',apiMethod:'delete',multiple:true}
+    ]
+};
+```
+
+or
+
+
+```sh
+$scope.settings = {
+    actions:[
+         {
+            'label':'Delete',
+            apiMethod:'delete',
+            multiple:{
+                only:true, // Action is only shown in the global control menu
+                show:true, // Action is available the global control menu => long term version of the version above
+                single:true // Action is only called once
+            }
+         }
+    ]
+};
+```
 
 License
 ----
