@@ -80,13 +80,17 @@
 
         <!-- List group -->
         <ul class="list-group">
-            <li class="list-group-item" ng-if="datalist.loading === false" ng-repeat="row in datalist.data" ng-include="'datalistElement.html'"></li>
+            <li class="list-group-item" ng-if="datalist.accessGranted === false && datalist.authenticated === false">{{datalist.langTextNotLogged}}</li>
+            <li class="list-group-item" ng-if="datalist.accessGranted === false && datalist.authenticated === true">{{datalist.langTextNoPermission}}</li>
+            <li class="list-group-item" ng-if="datalist.loading === false && datalist.accessGranted === true" ng-repeat="row in datalist.data" ng-include="'datalistElement.html'"></li>
             <li class="list-group-item text-center" ng-if="datalist.loading === true"><i ng-include="'datalistElementLoadingIcon.html'"></i> {{datalist.langPleaseWait}}</li>
         </ul>
     </div>
     <div class="datalist-simple" ng-if="datalist.simple === true">
-        <div class="datalist-item" ng-if="datalist.loading === false && datalist.subTemplate === undefined" ng-repeat="row in datalist.data">{{row.title}}</div>
-        <div class="datalist-item" ng-if="datalist.loading === false && datalist.subTemplate !== undefined" ng-repeat="row in datalist.data" ng-include="datalist.subTemplate"></div>
+        <li class="list-group-item" ng-if="datalist.accessGranted === false && datalist.authenticated === false">{{datalist.langTextNotLogged}}</li>
+        <li class="list-group-item" ng-if="datalist.accessGranted === false && datalist.authenticated === true">{{datalist.langTextNoPermission}}</li>
+        <div class="datalist-item" ng-if="datalist.loading === false && datalist.accessGranted === true &&  datalist.subTemplate === undefined" ng-repeat="row in datalist.data">{{row.title}}</div>
+        <div class="datalist-item" ng-if="datalist.loading === false && datalist.accessGranted === true && datalist.subTemplate !== undefined" ng-repeat="row in datalist.data" ng-include="datalist.subTemplate"></div>
         <div class="text-center" ng-if="datalist.loading === true"><i ng-include="'datalistElementLoadingIcon.html'"></i> {{datalist.langPleaseWait}}</div>
     </div>
     <uib-pager total-items="datalist.total" items-per-page="datalist.entriesPerPage" previous-text="{{datalist.langBtnPrevious}}" next-text="{{datalist.langBtnNext}}" ng-model="datalist.currentPage"></uib-pager>

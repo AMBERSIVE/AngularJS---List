@@ -3,7 +3,7 @@
 An AngularJS (1.5) service for displaying data (json-format).
 
 ### Version
-0.0.1.1
+0.0.2.1
 
 ### Installation
 
@@ -141,7 +141,11 @@ Every action is available in the global datalist functionslist, if you define it
 ```sh
 $scope.settings = {
     actions:[
-         {'label':'Delete',apiMethod:'delete',multiple:true}
+         {
+            label:'Delete',
+            apiMethod:'delete',
+            multiple:true
+         }
     ]
 };
 ```
@@ -153,7 +157,7 @@ or
 $scope.settings = {
     actions:[
          {
-            'label':'Delete',
+            label:'Delete',
             apiMethod:'delete',
             multiple:{
                 only:true, // Action is only shown in the global control menu
@@ -162,6 +166,30 @@ $scope.settings = {
             }
          }
     ]
+};
+```
+
+To restrict the access to the data or an action you can define roles. You can combine both methods.
+
+###### User restriction for action
+
+```sh
+$scope.settings = {
+    actions:[
+         {
+            label:'Delete',
+            apiMethod:'delete',
+            roles:['Admin']
+         }
+    ]
+};
+```
+
+###### User restriction for complete data
+
+```sh
+$scope.settings = {
+    roles:['Admin']
 };
 ```
 
