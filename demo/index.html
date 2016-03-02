@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AngularJS - AMBERSIVE Datalist Directive/Service</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../bower_components/SpinKit/css/spinkit.css" />
+    <link   href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="../bower_components/ambersive-router-ui-auth/build/auth.js"></script>
+    <script src="../bower_components/ambersive-db/build/db.js"></script>
+    <script src="../bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="../build/list.js"></script>
+    <script>
+
+
+        angular.module('app', ['ambersive.list','ambersive.routerui.auth','ui.router','ui.bootstrap'])
+        .run(function($log,$urlRouter){
+
+            $urlRouter.sync();
+            $urlRouter.listen();
+
+        })
+        .config(['$stateProvider','$urlRouterProvider','$dbSettingsProvider','$authenticationSettingsProvider','$windowProvider',
+            function ($stateProvider,$urlRouterProvider,$dbSettingsProvider,$authenticationSettingsProvider,$windowProvider) {
+
+                var protocol = $windowProvider.$get().location.protocol,
+                        host = $windowProvider.$get().location.host,
+                        path = $windowProvider.$get().location.pathname,
+                        base = protocol+'//'+host+path;
+
+                $dbSettingsProvider.setBaseUrl(base);
+
+                $authenticationSettingsProvider.setApiValue('baseUrl',base);
+                $authenticationSettingsProvider.setApiValue('url','data/response.json');
+
+                $authenticationSettingsProvider.setValue('redirect401Route','app.error');
+                $authenticationSettingsProvider.setValue('redirect403Route','http://orf.at');
+                $authenticationSettingsProvider.setValue('redirect404Route','app.error');
+
+                $dbSettingsProvider.setBaseUrl('http://jsonplaceholder.typicode.com/');
+                $dbSettingsProvider.register('Demo',{'url':'posts',except:[]});
+
+                    $stateProvider
+                       .state('app', {
+                           abstract: true,
+                           data: {
+                                roles: []
+                           },
+                           views: {
+                               '': {
+                                   template: '<div ui-view="main"></div>'
+                               }
+                           }
+                       })
+                       .state('app.state1', {
+                            parent: 'app',
+                            url:'/state1',
+                            views: {
+                                'main@app': {
+                                    template: '<datalist></datalist>'
+                                }
+                            }
+                       })
+                       .state('app.error', {
+                           parent: 'app',
+                           url:'/error',
+                           data: {
+                           },
+                           views: {
+                               'main@app': {
+                                   template: '<div>error</div>'
+                               }
+                           }
+                       });
+
+
+                    $urlRouterProvider.otherwise('/state1');
+
+            }])
+           .controller('DemoController',
+                   function($scope,$log,$rootScope,Auth){
+
+                       $scope.settings = {
+                           actions:[
+                               {'label':'Delete',apiMethod:'delete',allowMultiple:true}
+                           ]
+                       };
+
+                       $scope.restObject  = 'data/response.json';
+                       $scope.restObject2 = {method:'get',url:'data/response.json'};
+
+                   }
+           );
+
+    </script>
+
+</head>
+<body ng-app="app" ng-controller="DemoController">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>List Directive/Service</h1>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <h2>Datalist:</h2>
+                <datalist api="Demo" settings="settings"></datalist>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <h2>Datalist Custom:</h2>
+                <datalist api="Demo" settings="settings" sub-template="custom.html"></datalist>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <h2>Datalist Simple:</h2>
+                <datalist api="Demo" settings="settings" sub-template="custom.html" simple="true"></datalist>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <h2>Datalist Using Rest as String:</h2>
+                <datalist rest="restObject" simple="true"></datalist>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <h2>Datalist Using Rest as Object:</h2>
+                <datalist rest="restObject2" simple="true"></datalist>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

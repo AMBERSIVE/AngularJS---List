@@ -1,0 +1,93 @@
+<script type="text/ng-template" id="datalistElement.html">
+    <div class="row">
+        <div class="col-xs-10">
+            <div class="checkbox" ng-if="datalist.actions.length > 0">
+                <label>
+                    <input type="checkbox" ng-model="row.isSelected" ng-click="datalist.toggleItem($event,row)" ng-disabled="datalist.rowDisabled(row.id)">
+                    <div ng-if="datalist.subTemplate === undefined">{{row.title}}</div>
+                    <div ng-if="datalist.subTemplate !== undefined" ng-include="datalist.subTemplate"></div>
+                </label>
+            </div>
+            <div ng-if="(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate === undefined">
+                {{row.title}}
+            </div>
+            <div ng-if="(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate !== undefined" ng-include="datalist.subTemplate"></div>
+        </div>
+        <div class="col-xs-2">
+            <div class="pull-right" ng-if="datalist.actions.length > 0">
+                <div class="item dropdown" uib-dropdown>
+                    <a href="#" class="btn btn-link dropdown-toggle" uib-dropdown-toggle>
+                        <i class="fa fa-chevron-down" ng-if="datalist.rowDisabled(row.id) === false || data.actionLoading === false"></i>
+                        <i ng-include="'datalistElementLoadingIcon.html'" ng-if="datalist.rowDisabled(row.id) === true || data.actionLoading === true"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li ng-repeat="action in datalist.actions" ng-disabled="datalist.actionLoading"><a ng-click="datalist.callAction(action,row,event)"><i ng-if="action.icon" class="{{action.icon}}"></i> {{action.label}}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="datalistElementLoadingIcon.html">
+    <div class="loader loader--style3" title="2">
+        <svg width="20" height="20" version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+          <path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
+            <animateTransform attributeType="xml"
+              attributeName="transform"
+              type="rotate"
+              from="0 25 25"
+              to="360 25 25"
+              dur="0.6s"
+              repeatCount="indefinite"/>
+            </path>
+          </svg>
+    </div>
+</script>
+
+<div class="datalist_container">
+    <div class="panel panel-default" ng-if="datalist.simple === false">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <div class="row" ng-if="settings.headline !== undefined || settings.description !== undefined">
+                <div class="col-xs-12">
+                    <strong ng-if="settings.headline">{{settings.headline}}</strong>
+                    <p ng-if="settings.description">{{settings.description}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-10">
+                    <div class="checkbox" ng-if="datalist.actions.length > 0">
+                        <label>
+                            <input type="checkbox" ng-model="datalist.allSelected" ng-click="datalist.selectAll($event)" ng-disabled="loading || datalist.actionLoading"> <span translate>{{datalist.langChooseAll}}</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <div class="item dropdown pull-right" uib-dropdown>
+                        <i class="btn btn-link" ng-include="'datalistElementLoadingIcon.html'" ng-if="datalist.actionLoading === true"></i>
+                        <a href="#" class="btn btn-link dropdown-toggle" ng-if="datalist.actionLoading !== true" uib-dropdown-toggle>
+                            <i class="fa fa-chevron-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li ng-disabled="datalist.actionLoading"><a ng-click="datalist.refresh($event)" ng-disabled="datalist.actionLoading"><i class="fa fa-refresh"></i>  <span translate>{{datalist.langRefresh}}</span></a></li>
+                            <li ng-repeat="action in datalist.actionsMultiple" ng-disabled="datalist.actionLoading"><a ng-click="datalist.callActionMultiple(action,datalist.selectedItems,event)" ng-disabled="datalist.actionLoading"><i ng-if="action.icon" class="{{action.icon}}"></i> {{action.label}}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- List group -->
+        <ul class="list-group">
+            <li class="list-group-item" ng-if="datalist.loading === false" ng-repeat="row in datalist.data" ng-include="'datalistElement.html'"></li>
+            <li class="list-group-item text-center" ng-if="datalist.loading === true"><i ng-include="'datalistElementLoadingIcon.html'"></i> {{datalist.langPleaseWait}}</li>
+        </ul>
+    </div>
+    <div class="datalist-simple" ng-if="datalist.simple === true">
+        <div class="datalist-item" ng-if="datalist.loading === false && datalist.subTemplate === undefined" ng-repeat="row in datalist.data">{{row.title}}</div>
+        <div class="datalist-item" ng-if="datalist.loading === false && datalist.subTemplate !== undefined" ng-repeat="row in datalist.data" ng-include="datalist.subTemplate"></div>
+        <div class="text-center" ng-if="datalist.loading === true"><i ng-include="'datalistElementLoadingIcon.html'"></i> {{datalist.langPleaseWait}}</div>
+    </div>
+    <uib-pager total-items="datalist.total" items-per-page="datalist.entriesPerPage" previous-text="{{datalist.langBtnPrevious}}" next-text="{{datalist.langBtnNext}}" ng-model="datalist.currentPage"></uib-pager>
+</div>

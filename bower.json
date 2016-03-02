@@ -1,0 +1,36 @@
+{
+  "name": "ambersive-list",
+  "version": "0.0.1.0",
+  "authors": [
+    "Manuel Ihl <manuel.ihl@ambersive.com>"
+  ],
+  "description": "AngularJS (1.5) datalist module for an easy way to display a list of data.",
+  "main": "build/menu.js",
+  "keywords": [
+    "AngularJS",
+    "Angular",
+    "Auth",
+    "Bootstrap-UI",
+    "Bootstrap"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:AMBERSIVE/AngularJS---ListSrv.git"
+  },
+  "ignore": [
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "angular": "*",
+    "ambersive-db": "*",
+    "bootstrap": "^3.3.6",
+    "ambersive-router-ui-auth": "*",
+    "angular-ui-router": "~0.2.15",
+    "angular-bootstrap": "^1.2.1"
+  },
+  "devDependencies":{
+  },
+  "license": "MIT",
+  "homepage": "http://www.ambersive.com"
+}
