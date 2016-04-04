@@ -580,7 +580,7 @@
                         var actionClass = {},
                             callFn      = null,
                             counter     = 0,
-                            counterFn   = function(response,single){
+                            counterFn   = function(response,single,refresh){
 
                                 if(single === undefined){ single = false; }
 
@@ -593,6 +593,13 @@
 
                                 if(counter === entries.length){
                                     datalist.actionLoading = false;
+
+                                    if(refresh === true){
+
+                                        datalist.refresh();
+
+                                    }
+
                                 }
                             },
                             singleCall = false;
@@ -605,12 +612,12 @@
                                 actionClass[action.apiMethod](entry).then(
                                     function (result, refresh) {
 
-                                        counterFn(result,singleCall);
+                                        counterFn(result,singleCall,actionClass[action.apiMethod].refresh);
 
                                     },
                                     function (errorResult) {
 
-                                        counterFn(errorResult,singleCall);
+                                        counterFn(errorResult,singleCall,actionClass[action.apiMethod].refresh);
 
                                     }
                                 );
@@ -627,12 +634,12 @@
                                     actionClass[action.apiMethod](entry).then(
                                         function (result, refresh) {
 
-                                            counterFn(result);
+                                            counterFn(result,false,actionClass[action.apiMethod].refresh);
 
                                         },
                                         function (errorResult) {
 
-                                            counterFn(errorResult);
+                                            counterFn(errorResult,false,actionClass[action.apiMethod].refresh);
 
                                         }
                                     );
@@ -681,7 +688,7 @@
 
                     datalist.toggleItem = function(event,row){
 
-                        var index = datalist.selectedItems.indexOf(row.id);
+                        var index = datalist.selectedItems.indexOf(row.id); 
 
                         if(row.isSelected === true && index === -1){
                             datalist.selectedItems.push(row.id);
