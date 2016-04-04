@@ -92,8 +92,6 @@
                                 return false;
                             }
 
-                            $log.log(neededRoles);
-
                             accessGranted = User.roles.some(function(role){
                                 return (neededRoles.indexOf(role) > -1);
                             });
@@ -427,7 +425,7 @@
                                     datalist.data = [];
                                     deferred.reject(errorResult);
 
-                                } 
+                                }
                             );
 
                         }
@@ -622,12 +620,12 @@
                                 actionClass[action.apiMethod](entry).then(
                                     function (result, refresh) {
 
-                                        counterFn(result,singleCall,actionClass[action.apiMethod].refresh);
+                                        counterFn(result,singleCall,action.refresh);
 
                                     },
                                     function (errorResult) {
 
-                                        counterFn(errorResult,singleCall,actionClass[action.apiMethod].refresh);
+                                        counterFn(errorResult,singleCall,action.refresh);
 
                                     }
                                 );
@@ -644,12 +642,12 @@
                                     actionClass[action.apiMethod](entry).then(
                                         function (result, refresh) {
 
-                                            counterFn(result,false,actionClass[action.apiMethod].refresh);
+                                            counterFn(result,false,action.refresh);
 
                                         },
                                         function (errorResult) {
 
-                                            counterFn(errorResult,false,actionClass[action.apiMethod].refresh);
+                                            counterFn(errorResult,false,action.refresh);
 
                                         }
                                     );
@@ -663,10 +661,10 @@
                             callFn = function(entry){
                                 action.fn(entry).then(
                                     function successHandler(result,refresh){
-                                        counterFn(result,singleCall);
+                                        counterFn(result,singleCall,action.refresh);
                                     },
                                     function errorHandler(errorResult){
-                                        counterFn(errorResult,singleCall);
+                                        counterFn(errorResult,singleCall,action.refresh);
                                     }
                                 );
                             };
