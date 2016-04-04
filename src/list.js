@@ -466,7 +466,10 @@
                      */
 
                     datalist.refresh = function(event){
-                        event.preventDefault();
+
+                        if(event !== undefined) {
+                            event.preventDefault();
+                        }
 
                         datalist.selectedItems = [];
                         datalist.selectAll = false;
