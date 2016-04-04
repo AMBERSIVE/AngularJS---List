@@ -369,6 +369,11 @@
                                     datalist.result         = data;
                                     datalist.total          = data.length;
                                     datalist.loading        = false;
+
+                                    $timeout(function(){
+                                        $scope.$apply();
+                                    },0);
+
                                 }
                                 else if(angular.isObject(data)){
 
@@ -383,6 +388,10 @@
                                     } else {
                                         datalist.result = data;
                                     }
+
+                                    $timeout(function(){
+                                        $scope.$apply();
+                                    },0);
 
                                     datalist.loading = false;
 
@@ -688,7 +697,7 @@
 
                     datalist.toggleItem = function(event,row){
 
-                        var index = datalist.selectedItems.indexOf(row.id); 
+                        var index = datalist.selectedItems.indexOf(row.id);
 
                         if(row.isSelected === true && index === -1){
                             datalist.selectedItems.push(row.id);
