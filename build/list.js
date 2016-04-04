@@ -418,6 +418,7 @@
                                 function(result){
 
                                     resultFn(result);
+                                    datalist.data = datalist.result;
                                     deferred.resolve();
 
                                 },
@@ -426,7 +427,7 @@
                                     datalist.data = [];
                                     deferred.reject(errorResult);
 
-                                }
+                                } 
                             );
 
                         }
