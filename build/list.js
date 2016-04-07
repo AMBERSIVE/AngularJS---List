@@ -547,7 +547,7 @@
                             action.fn(row.id,row).then(
                                 function successHandler(response){
 
-                                    if(response.refresh === undefined){
+                                    if(response !== undefined && response.refresh === undefined){
                                         response.refresh = true;
                                     }
 
@@ -555,7 +555,7 @@
                                         action.successFn(response.result,$element);
                                     }
 
-                                    if(refresh === true){
+                                    if(response !== undefined && response.refresh === true){
                                         datalist.getData(datalist.currentPage);
                                     }
 
@@ -571,7 +571,7 @@
                                         errorResult.refresh = true;
                                     }
 
-                                    if(refresh === true){
+                                    if(errorResult !== undefined && errorResult.refresh === true){
                                         datalist.getData(datalist.currentPage);
                                     }
 
