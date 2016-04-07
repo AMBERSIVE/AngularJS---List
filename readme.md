@@ -3,7 +3,7 @@
 An AngularJS (1.5) service for displaying data (json-format).
 
 ### Version
-0.0.2.7
+0.0.2.8
 
 ### Installation
 
@@ -98,7 +98,7 @@ $scope.settings = {
 
                 if(id !== undefined){
                     alert('This entry has the ID:'+id);
-                    deferred.resolve();
+                    deferred.resolve({result:RESULTDATA,refresh:false});
                 }
 
                 return deferred.promise;
@@ -121,7 +121,7 @@ $scope.settings = {
 
                 if(id !== undefined){
                     window.print();
-                    deferred.resolve();
+                    deferred.resolve({result:RESULTDATA,refresh:false});
                 }
 
                 return deferred.promise;

@@ -545,9 +545,14 @@
                         else if(action.fn !== undefined){
 
                             action.fn(row.id,row).then(
-                                function successHandler(result,refresh){
+                                function successHandler(response){
+
+                                    if(response.refresh === undefined){
+                                        response.refresh = true;
+                                    }
+
                                     if(action.successFn !== undefined && angular.isFunction(action.successFn)){
-                                        action.successFn(result,$element);
+                                        action.successFn(response.result,$element);
                                     }
 
                                     if(refresh === true){
@@ -555,10 +560,19 @@
                                     }
 
                                     removeIdFromActionItem(row.id);
+
                                 },
                                 function errorHandler(errorResult){
                                     if(action.errorFn !== undefined && angular.isFunction(action.errorFn)){
                                         action.errorFn(errorResult,$element);
+                                    }
+
+                                    if(errorResult.refresh === undefined){
+                                        errorResult.refresh = true;
+                                    }
+
+                                    if(refresh === true){
+                                        datalist.getData(datalist.currentPage);
                                     }
 
                                     removeIdFromActionItem(row.id);
