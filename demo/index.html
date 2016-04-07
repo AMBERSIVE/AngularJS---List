@@ -112,7 +112,7 @@
 
                                        $timeout(function(){
                                            console.log(entries);
-                                           deferred.resolve();
+                                           deferred.reject();
                                        });
 
                                        return deferred.promise;

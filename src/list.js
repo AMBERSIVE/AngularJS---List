@@ -556,7 +556,7 @@
                                         actionCaller();
                                     },
                                     function(eF){
-
+                                        removeIdFromActionItem(row.id);
                                     }
                                 );
 
@@ -612,7 +612,7 @@
                                         actionCaller();
                                     },
                                     function(eF){
-
+                                        removeIdFromActionItem(row.id);
                                     }
                                 );
 
@@ -728,6 +728,9 @@
                                     },
                                     function(eF){
 
+                                        datalist.actionItems = [];
+                                        datalist.actionLoading = false;
+
                                     }
                                 );
 
@@ -778,6 +781,9 @@
                                         actionCaller();
                                     },
                                     function(eF){
+
+                                        datalist.actionItems = [];
+                                        datalist.actionLoading = false;
 
                                     }
                                 );
