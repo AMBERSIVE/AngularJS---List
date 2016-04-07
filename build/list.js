@@ -489,13 +489,18 @@
                      * @param event
                      */
 
-                    datalist.callAction = function(action,row,event){
+                    datalist.callAction = function(action,row,event,entries){
+
+                        if(entries === undefined){
+                            entries = [row.id];
+                        }
 
                         if(event !== undefined) {
                             event.preventDefault();
                         }
 
                         var actionClass = {},
+                            actionCaller,
                             removeIdFromActionItem = function(id){
 
                                 var index = datalist.actionItems.indexOf(id);
@@ -512,72 +517,110 @@
                         datalist.actionItems.push(row.id);
 
                         if(action.apiMethod !== undefined){
-                            actionClass = DB(datalist.api);
-                            actionClass[action.apiMethod](row.id,row).then(
-                                function(result,refresh){
+                            actionClass     = DB(datalist.api);
+                            actionCaller    = function(){
+                                actionClass[action.apiMethod](row.id,row).then(
+                                    function(result,refresh){
 
-                                    if(refresh === undefined){
-                                        refresh = true;
+                                        if(refresh === undefined){
+                                            refresh = true;
+                                        }
+
+                                        if(action.successFn !== undefined && angular.isFunction(action.successFn)){
+                                            action.successFn(result,$element);
+                                        }
+
+                                        if(refresh === true){
+                                            datalist.getData(datalist.currentPage);
+                                        }
+
+                                        removeIdFromActionItem(row.id);
+
+                                    },
+                                    function(errorResult){
+
+                                        if(action.errorFn !== undefined && angular.isFunction(action.errorFn)){
+                                            action.errorFn(errorResult,$element);
+                                        }
+
+                                        removeIdFromActionItem(row.id);
+
                                     }
+                                );
+                            };
 
-                                    if(action.successFn !== undefined && angular.isFunction(action.successFn)){
-                                        action.successFn(result,$element);
+                            if(action.preFn !== undefined){
+
+                                action.preFn(entries).then(
+                                    function(sF){
+                                        actionCaller();
+                                    },
+                                    function(eF){
+
                                     }
+                                );
 
-                                    if(refresh === true){
-                                        datalist.getData(datalist.currentPage);
-                                    }
+                            } else {
 
-                                    removeIdFromActionItem(row.id);
+                                actionCaller();
 
-                                },
-                                function(errorResult){
-
-                                    if(action.errorFn !== undefined && angular.isFunction(action.errorFn)){
-                                        action.errorFn(errorResult,$element);
-                                    }
-
-                                    removeIdFromActionItem(row.id);
-
-                                }
-                            );
+                            }
                         }
                         else if(action.fn !== undefined){
 
-                            action.fn(row.id,row).then(
-                                function successHandler(response){
+                            actionCaller    = function() {
+                                action.fn(row.id, row).then(
+                                    function successHandler(response) {
 
-                                    if(response !== undefined && response.refresh === undefined){
-                                        response.refresh = true;
+                                        if (response !== undefined && response.refresh === undefined) {
+                                            response.refresh = true;
+                                        }
+
+                                        if (action.successFn !== undefined && angular.isFunction(action.successFn)) {
+                                            action.successFn(response.result, $element);
+                                        }
+
+                                        if (response !== undefined && response.refresh === true) {
+                                            datalist.getData(datalist.currentPage);
+                                        }
+
+                                        removeIdFromActionItem(row.id);
+
+                                    },
+                                    function errorHandler(errorResult) {
+                                        if (action.errorFn !== undefined && angular.isFunction(action.errorFn)) {
+                                            action.errorFn(errorResult, $element);
+                                        }
+
+                                        if (errorResult.refresh === undefined) {
+                                            errorResult.refresh = true;
+                                        }
+
+                                        if (errorResult !== undefined && errorResult.refresh === true) {
+                                            datalist.getData(datalist.currentPage);
+                                        }
+
+                                        removeIdFromActionItem(row.id);
                                     }
+                                );
+                            };
 
-                                    if(action.successFn !== undefined && angular.isFunction(action.successFn)){
-                                        action.successFn(response.result,$element);
+                            if(action.preFn !== undefined){
+
+                                action.preFn(entries).then(
+                                    function(sF){
+                                        actionCaller();
+                                    },
+                                    function(eF){
+
                                     }
+                                );
 
-                                    if(response !== undefined && response.refresh === true){
-                                        datalist.getData(datalist.currentPage);
-                                    }
+                            } else {
 
-                                    removeIdFromActionItem(row.id);
+                                actionCaller();
 
-                                },
-                                function errorHandler(errorResult){
-                                    if(action.errorFn !== undefined && angular.isFunction(action.errorFn)){
-                                        action.errorFn(errorResult,$element);
-                                    }
-
-                                    if(errorResult.refresh === undefined){
-                                        errorResult.refresh = true;
-                                    }
-
-                                    if(errorResult !== undefined && errorResult.refresh === true){
-                                        datalist.getData(datalist.currentPage);
-                                    }
-
-                                    removeIdFromActionItem(row.id);
-                                }
-                            );
+                            }
 
                         }
 
@@ -627,7 +670,8 @@
 
                                 }
                             },
-                            singleCall = false;
+                            singleCall = false,
+                            actionCaller;
 
                         if(action.apiMethod !== undefined){
 
@@ -648,29 +692,51 @@
                                 );
                             };
 
-                            if(action.multiple !== undefined && action.multiple.single === true){
+                            actionCaller = function(){
 
-                                singleCall = true;
-                                callFn(0);
+                                if(action.multiple !== undefined && action.multiple.single === true){
+
+                                    singleCall = true;
+                                    callFn(0);
+
+                                } else {
+                                    entries.forEach(function (entry, index) {
+
+                                        actionClass[action.apiMethod](entry).then(
+                                            function (result, refresh) {
+
+                                                counterFn(result,false,action.refresh);
+
+                                            },
+                                            function (errorResult) {
+
+                                                counterFn(errorResult,false,action.refresh);
+
+                                            }
+                                        );
+
+                                    });
+                                }
+
+                            };
+
+                            if(action.preFn !== undefined){
+
+                                action.preFn(entries).then(
+                                    function(sF){
+                                        actionCaller();
+                                    },
+                                    function(eF){
+
+                                    }
+                                );
 
                             } else {
-                                entries.forEach(function (entry, index) {
 
-                                    actionClass[action.apiMethod](entry).then(
-                                        function (result, refresh) {
+                                actionCaller();
 
-                                            counterFn(result,false,action.refresh);
-
-                                        },
-                                        function (errorResult) {
-
-                                            counterFn(errorResult,false,action.refresh);
-
-                                        }
-                                    );
-
-                                });
                             }
+
 
                         }
                         else if(action.fn !== undefined){
@@ -686,20 +752,42 @@
                                 );
                             };
 
-                            if(action.multiple !== undefined && action.multiple.single === true){
+                            actionCaller = function(){
 
-                                singleCall = true;
-                                callFn(0);
+                                if(action.multiple !== undefined && action.multiple.single === true){
+
+                                    singleCall = true;
+                                    callFn(0);
+
+                                } else {
+
+                                    entries.forEach(function(entry,index){
+
+                                        callFn(entry);
+
+                                    });
+
+                                }
+
+                            };
+
+                            if(action.preFn !== undefined){
+
+                                action.preFn(entries).then(
+                                    function(sF){
+                                        actionCaller();
+                                    },
+                                    function(eF){
+
+                                    }
+                                );
 
                             } else {
 
-                                entries.forEach(function(entry,index){
-
-                                    callFn(entry);
-
-                                });
+                                actionCaller();
 
                             }
+
 
                         }
 
