@@ -353,6 +353,7 @@
                     datalist.getData = function(page){
                         var deferred    = $q.defer(),
                             api         = {},
+                            apiData     = {},
                             resultFn    = function(result){
 
                                 var data = result;
@@ -412,7 +413,11 @@
 
                         if(datalist.api !== undefined){
                             api = DB(datalist.api);
-                            api[datalist.apiMethod]({page:page}).then(
+                            
+                            apiData = $state.params;
+                            apiData.page = page;
+
+                            api[datalist.apiMethod](apiData).then(
                                 function(result){
 
                                     resultFn(result);
