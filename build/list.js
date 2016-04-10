@@ -398,7 +398,7 @@
                                 deferred.resolve();
                             };
 
-                        if(page === undefined){
+                        if(page === undefined || page === 0){
                             page = 1;
                         }
 
