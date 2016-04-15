@@ -857,7 +857,7 @@
                         datalist.getMenu();
 
                     };
-
+ 
                     datalist.init();
 
                     /***
@@ -865,6 +865,12 @@
                      */
 
                     $scope.$on('$stateAuthenticationUser',function(event,args){
+
+                        datalist.getMenu();
+                        datalist.getData();
+                    });
+
+                    $scope.$on('$updateLists',function(event,args){
 
                         datalist.getMenu();
                         datalist.getData();
