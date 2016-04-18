@@ -22,6 +22,9 @@
                 langBtnPrevious:'Previous',
                 langTextNoPermission:'You do not have enough permission to see this data.',
                 langTextNotLogged:'Please login to see this data',
+                langSearchBtn:'Search',
+                langSearchPlaceholder:'Searchterm',
+                langNoEntries:'No entries avaiable',
                 template:'src/views/ambersive.list.default.html',
                 entriesPerPage:10
             };
@@ -42,6 +45,9 @@
                         langBtnNext:values.langBtnNext,
                         langTextNoPermission:values.langTextNoPermission,
                         langTextNotLogged:values.langTextNotLogged,
+                        langSearchBtn:values.langSearchBtn,
+                        langSearchPlaceholder:values.langSearchPlaceholder,
+                        langNoEntries:values.langNoEntries,
                         entriesPerPage:values.entriesPerPage
                     };
                 }
@@ -134,6 +140,7 @@
             directive.scope = {
                 template:'@',
                 subTemplate:'@',
+                searchTemplate:'@',
                 rest:'=',
                 api:'@',
                 apiMethod:'@',
@@ -172,10 +179,15 @@
                     datalist.entriesPerPage         = $datalistSettings.entriesPerPage;
                     datalist.langTextNoPermission   = $datalistSettings.langTextNoPermission;
                     datalist.langTextNotLogged      = $datalistSettings.langTextNotLogged;
+                    datalist.langSearchBtn          = $datalistSettings.langSearchBtn;
+                    datalist.langSearchPlaceholder  = $datalistSettings.langSearchPlaceholder;
+                    datalist.langNoEntries          = $datalistSettings.langNoEntries;
+                    
                     datalist.currentPage            = 0;
 
                     datalist.authenticated          = DatalistSrv.isAuthenticated;
                     datalist.accessGranted          = true;
+                    datalist.searchTerm             = '';
 
                     /**
                      * Get parameters
@@ -189,6 +201,12 @@
                     if($scope.apiMethod !== undefined){ datalist.apiMethod = $scope.apiMethod; } else { datalist.apiMethod = 'get';}
 
                     datalist.simple = ($scope.simple === 'true' && $scope.simple !== undefined);
+                    
+                    // Fallbacks
+                    
+                    if(settings.search === undefined){
+                        settings.search = false;
+                    }
 
                     $scope.$watch('datalist.currentPage', function() {
 
@@ -297,6 +315,10 @@
                         return false;
                     };
 
+                    datalist.startSearch = function () {
+                        datalist.getData(null,datalist.searchTerm);
+                    };
+
                     /***
                      * Init function
                      */
@@ -350,11 +372,12 @@
                      * @returns {*}
                      */
 
-                    datalist.getData = function(page){
-                        var deferred    = $q.defer(),
-                            api         = {},
-                            apiData     = {},
-                            resultFn    = function(result){
+                    datalist.getData = function(page,searchTerm){
+                        var deferred        = $q.defer(),
+                            api             = {},
+                            apiData         = {},
+                            restExtention   = '',
+                            resultFn        = function(result){
 
                                 var data = result;
 
@@ -398,7 +421,7 @@
                                 deferred.resolve();
                             };
 
-                        if(page === undefined || page === 0){
+                        if(page === undefined || page === 0 || page === null){
                             page = 1;
                         }
 
@@ -416,6 +439,10 @@
                             
                             apiData = $state.params;
                             apiData.page = page;
+
+                            if(searchTerm !== undefined && searchTerm !== ''){
+                                apiData.search = searchTerm;
+                            }
 
                             api[datalist.apiMethod](apiData).then(
                                 function(result){
@@ -436,9 +463,15 @@
                         }
                         else if (datalist.rest !== undefined){
 
+                            restExtention = '';
+
+                            if(searchTerm !== undefined  && searchTerm !== ''){
+                                restExtention = '?search='+searchTerm;
+                            }
+
                             if(angular.isString(datalist.rest)){
 
-                                $http.get(datalist.rest, {}).then(function successCallback(response) {
+                                $http.get(datalist.rest+restExtention, {}).then(function successCallback(response) {
                                     resultFn(response.data);
                                 }, function errorCallback(response) {
                                     $log.warn('aambersive.list: $http get error (rest)');
@@ -447,7 +480,7 @@
 
                             }
                             else if(angular.isObject(datalist.rest)){
-                                $http(datalist.rest).then(function successCallback(response) {
+                                $http(datalist.rest+restExtention).then(function successCallback(response) {
                                     resultFn(response.data);
                                 }, function errorCallback(response) {
                                     $log.warn('aambersive.list: $http get error (rest)');
@@ -948,7 +981,7 @@ angular.module('ambersive.list').run(['$templateCache', function($templateCache)
     "              repeatCount=\"indefinite\"/>\n" +
     "            </path>\n" +
     "          </svg>\n" +
-    "    </div></script><div class=datalist_container><div class=\"panel panel-default\" ng-if=\"datalist.simple === false\"><div class=panel-heading><div class=row ng-if=\"settings.headline !== undefined || settings.description !== undefined\"><div class=col-xs-12><strong ng-if=settings.headline>{{settings.headline}}</strong><p ng-if=settings.description>{{settings.description}}</p></div></div><div class=row><div class=col-xs-10><div class=checkbox ng-if=\"datalist.actions.length > 0\"><label><input type=checkbox ng-model=datalist.allSelected ng-click=datalist.selectAll($event) ng-disabled=\"loading || datalist.actionLoading\"> <span translate>{{datalist.langChooseAll}}</span></label></div></div><div class=col-xs-2><div class=\"item dropdown pull-right\" uib-dropdown><i class=\"btn btn-link\" ng-include=\"'datalistElementLoadingIcon.html'\" ng-if=\"datalist.actionLoading === true\"></i> <a href=# class=\"btn btn-link dropdown-toggle\" ng-if=\"datalist.actionLoading !== true\" uib-dropdown-toggle><i class=\"fa fa-chevron-down\"></i></a><ul class=\"dropdown-menu dropdown-menu-right\"><li ng-disabled=datalist.actionLoading><a ng-click=datalist.refresh($event) ng-disabled=datalist.actionLoading><i class=\"fa fa-refresh\"></i> <span translate>{{datalist.langRefresh}}</span></a></li><li ng-repeat=\"action in datalist.actionsMultiple\" ng-disabled=datalist.actionLoading><a ng-click=datalist.callActionMultiple(action,datalist.selectedItems,event) ng-disabled=datalist.actionLoading><i ng-if=action.icon class={{action.icon}}></i> {{action.label}}</a></li></ul></div></div></div></div><ul class=list-group><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === false\">{{datalist.langTextNotLogged}}</li><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === true\">{{datalist.langTextNoPermission}}</li><li class=list-group-item ng-if=\"datalist.loading === false && datalist.accessGranted === true\" ng-repeat=\"row in datalist.data\" ng-include=\"'datalistElement.html'\"></li><li class=\"list-group-item text-center\" ng-if=\"datalist.loading === true\"><i ng-include=\"'datalistElementLoadingIcon.html'\"></i> {{datalist.langPleaseWait}}</li></ul></div><div class=datalist-simple ng-if=\"datalist.simple === true\"><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === false\">{{datalist.langTextNotLogged}}</li><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === true\">{{datalist.langTextNoPermission}}</li><div class=datalist-item ng-if=\"datalist.loading === false && datalist.accessGranted === true &&  datalist.subTemplate === undefined\" ng-repeat=\"row in datalist.data\">{{row.title}}</div><div class=datalist-item ng-if=\"datalist.loading === false && datalist.accessGranted === true && datalist.subTemplate !== undefined\" ng-repeat=\"row in datalist.data\" ng-include=datalist.subTemplate></div><div class=text-center ng-if=\"datalist.loading === true\"><i ng-include=\"'datalistElementLoadingIcon.html'\"></i> {{datalist.langPleaseWait}}</div></div><uib-pager total-items=datalist.total items-per-page=datalist.entriesPerPage previous-text={{datalist.langBtnPrevious}} next-text={{datalist.langBtnNext}} ng-model=datalist.currentPage></uib-pager></div>"
+    "    </div></script><div class=datalist_container><div class=\"row search-container\" ng-if=\"settings.search === true\"><div class=col-xs-12><form class=form-inline role=search ng-submit=datalist.startSearch()><div class=form-group><input ng-model=datalist.searchTerm class=form-control placeholder={{datalist.langSearchPlaceholder}}></div><button type=submit class=\"btn btn-default\">{{datalist.langSearchBtn}}</button></form></div></div><div class=\"panel panel-default\" ng-if=\"datalist.simple === false\"><div class=panel-heading><div class=row ng-if=\"settings.headline !== undefined || settings.description !== undefined\"><div class=col-xs-12><strong ng-if=settings.headline>{{settings.headline}}</strong><p ng-if=settings.description>{{settings.description}}</p></div></div><div class=row><div class=col-xs-10><div class=checkbox ng-if=\"datalist.actions.length > 0\"><label><input type=checkbox ng-model=datalist.allSelected ng-click=datalist.selectAll($event) ng-disabled=\"loading || datalist.actionLoading\"> <span translate>{{datalist.langChooseAll}}</span></label></div></div><div class=col-xs-2><div class=\"item dropdown pull-right\" uib-dropdown><i class=\"btn btn-link\" ng-include=\"'datalistElementLoadingIcon.html'\" ng-if=\"datalist.actionLoading === true\"></i> <a href=# class=\"btn btn-link dropdown-toggle\" ng-if=\"datalist.actionLoading !== true\" uib-dropdown-toggle><i class=\"fa fa-chevron-down\"></i></a><ul class=\"dropdown-menu dropdown-menu-right\"><li ng-disabled=datalist.actionLoading><a ng-click=datalist.refresh($event) ng-disabled=datalist.actionLoading><i class=\"fa fa-refresh\"></i> <span translate>{{datalist.langRefresh}}</span></a></li><li ng-repeat=\"action in datalist.actionsMultiple\" ng-disabled=datalist.actionLoading><a ng-click=datalist.callActionMultiple(action,datalist.selectedItems,event) ng-disabled=datalist.actionLoading><i ng-if=action.icon class={{action.icon}}></i> {{action.label}}</a></li></ul></div></div></div></div><ul class=list-group><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === false\">{{datalist.langTextNotLogged}}</li><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === true\">{{datalist.langTextNoPermission}}</li><li class=list-group-item ng-if=\"datalist.loading === false && datalist.accessGranted === true\" ng-repeat=\"row in datalist.data\" ng-include=\"'datalistElement.html'\"></li><li class=\"list-group-item text-center\" ng-if=\"datalist.loading === true\"><i ng-include=\"'datalistElementLoadingIcon.html'\"></i> {{datalist.langPleaseWait}}</li></ul></div><div class=datalist-simple ng-if=\"datalist.simple === true\"><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === false\">{{datalist.langTextNotLogged}}</li><li class=list-group-item ng-if=\"datalist.accessGranted === false && datalist.authenticated === true\">{{datalist.langTextNoPermission}}</li><div class=datalist-item ng-if=\"datalist.loading === false && datalist.accessGranted === true &&  datalist.subTemplate === undefined\" ng-repeat=\"row in datalist.data\">{{row.title}}</div><div class=datalist-item ng-if=\"datalist.loading === false && datalist.accessGranted === true && datalist.subTemplate !== undefined\" ng-repeat=\"row in datalist.data\" ng-include=datalist.subTemplate></div><div class=text-center ng-if=\"datalist.loading === true\"><i ng-include=\"'datalistElementLoadingIcon.html'\"></i> {{datalist.langPleaseWait}}</div></div><uib-pager total-items=datalist.total items-per-page=datalist.entriesPerPage previous-text={{datalist.langBtnPrevious}} next-text={{datalist.langBtnNext}} ng-model=datalist.currentPage></uib-pager></div>"
   );
 
 }]);

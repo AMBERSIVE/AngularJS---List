@@ -22,6 +22,9 @@
                 langBtnPrevious:'Previous',
                 langTextNoPermission:'You do not have enough permission to see this data.',
                 langTextNotLogged:'Please login to see this data',
+                langSearchBtn:'Search',
+                langSearchPlaceholder:'Searchterm',
+                langNoEntries:'No entries avaiable',
                 template:'src/views/ambersive.list.default.html',
                 entriesPerPage:10
             };
@@ -42,6 +45,9 @@
                         langBtnNext:values.langBtnNext,
                         langTextNoPermission:values.langTextNoPermission,
                         langTextNotLogged:values.langTextNotLogged,
+                        langSearchBtn:values.langSearchBtn,
+                        langSearchPlaceholder:values.langSearchPlaceholder,
+                        langNoEntries:values.langNoEntries,
                         entriesPerPage:values.entriesPerPage
                     };
                 }
@@ -134,6 +140,7 @@
             directive.scope = {
                 template:'@',
                 subTemplate:'@',
+                searchTemplate:'@',
                 rest:'=',
                 api:'@',
                 apiMethod:'@',
@@ -172,10 +179,15 @@
                     datalist.entriesPerPage         = $datalistSettings.entriesPerPage;
                     datalist.langTextNoPermission   = $datalistSettings.langTextNoPermission;
                     datalist.langTextNotLogged      = $datalistSettings.langTextNotLogged;
+                    datalist.langSearchBtn          = $datalistSettings.langSearchBtn;
+                    datalist.langSearchPlaceholder  = $datalistSettings.langSearchPlaceholder;
+                    datalist.langNoEntries          = $datalistSettings.langNoEntries;
+                    
                     datalist.currentPage            = 0;
 
                     datalist.authenticated          = DatalistSrv.isAuthenticated;
                     datalist.accessGranted          = true;
+                    datalist.searchTerm             = '';
 
                     /**
                      * Get parameters
@@ -189,6 +201,12 @@
                     if($scope.apiMethod !== undefined){ datalist.apiMethod = $scope.apiMethod; } else { datalist.apiMethod = 'get';}
 
                     datalist.simple = ($scope.simple === 'true' && $scope.simple !== undefined);
+                    
+                    // Fallbacks
+                    
+                    if(settings.search === undefined){
+                        settings.search = false;
+                    }
 
                     $scope.$watch('datalist.currentPage', function() {
 
@@ -297,6 +315,10 @@
                         return false;
                     };
 
+                    datalist.startSearch = function () {
+                        datalist.getData(null,datalist.searchTerm);
+                    };
+
                     /***
                      * Init function
                      */
@@ -350,11 +372,12 @@
                      * @returns {*}
                      */
 
-                    datalist.getData = function(page){
-                        var deferred    = $q.defer(),
-                            api         = {},
-                            apiData     = {},
-                            resultFn    = function(result){
+                    datalist.getData = function(page,searchTerm){
+                        var deferred        = $q.defer(),
+                            api             = {},
+                            apiData         = {},
+                            restExtention   = '',
+                            resultFn        = function(result){
 
                                 var data = result;
 
@@ -398,7 +421,7 @@
                                 deferred.resolve();
                             };
 
-                        if(page === undefined || page === 0){
+                        if(page === undefined || page === 0 || page === null){
                             page = 1;
                         }
 
@@ -416,6 +439,10 @@
                             
                             apiData = $state.params;
                             apiData.page = page;
+
+                            if(searchTerm !== undefined && searchTerm !== ''){
+                                apiData.search = searchTerm;
+                            }
 
                             api[datalist.apiMethod](apiData).then(
                                 function(result){
@@ -436,9 +463,15 @@
                         }
                         else if (datalist.rest !== undefined){
 
+                            restExtention = '';
+
+                            if(searchTerm !== undefined  && searchTerm !== ''){
+                                restExtention = '?search='+searchTerm;
+                            }
+
                             if(angular.isString(datalist.rest)){
 
-                                $http.get(datalist.rest, {}).then(function successCallback(response) {
+                                $http.get(datalist.rest+restExtention, {}).then(function successCallback(response) {
                                     resultFn(response.data);
                                 }, function errorCallback(response) {
                                     $log.warn('aambersive.list: $http get error (rest)');
@@ -447,7 +480,7 @@
 
                             }
                             else if(angular.isObject(datalist.rest)){
-                                $http(datalist.rest).then(function successCallback(response) {
+                                $http(datalist.rest+restExtention).then(function successCallback(response) {
                                     resultFn(response.data);
                                 }, function errorCallback(response) {
                                     $log.warn('aambersive.list: $http get error (rest)');

@@ -84,6 +84,7 @@
                    function($scope,$log,$rootScope,Auth,$q,$timeout){
 
                        $scope.settings = {
+                           search:true,
                            actions:[
                                {'label':'Delete',apiMethod:'delete',multiple:true,refresh:true,preFn:function(entries){
                                    var deferred = $q.defer();
@@ -144,9 +145,10 @@
                        };
 
                        $scope.settingsPermission = {
-                         permission:{
-                             roles:['Admin']
-                         }
+                             search:true,
+                             permission:{
+                                 roles:['Admin']
+                             }
                        };
 
                        $scope.restObject  = 'data/response.json';
