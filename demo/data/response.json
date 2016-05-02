@@ -1,9 +1,9 @@
 {
-  "status":200,
+  "status":403,
   "data":{
-    "total":2,
+    "total":0,
     "entries":[
-      {"id":1,"title":"Testeintrag 1"}
+
     ]
   }
 }

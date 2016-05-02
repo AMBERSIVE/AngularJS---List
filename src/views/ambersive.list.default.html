@@ -28,6 +28,20 @@
         </div>
     </div>
 </script>
+<script type="text/ng-template" id="datalistElementEmpty.html">
+    <div class="row">
+        <div class="col-xs-12">
+            {{datalist.langNoEntries}}
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="datalistElementError.html">
+    <div class="row">
+        <div class="col-xs-12">
+            {{datalist.errorMessage}}
+        </div>
+    </div>
+</script>
 
 <script type="text/ng-template" id="datalistElementLoadingIcon.html">
     <div class="loader loader--style3" title="2">
@@ -90,10 +104,13 @@
 
         <!-- List group -->
         <ul class="list-group">
-            <li class="list-group-item" ng-if="datalist.accessGranted === false && datalist.authenticated === false">{{datalist.langTextNotLogged}}</li>
-            <li class="list-group-item" ng-if="datalist.accessGranted === false && datalist.authenticated === true">{{datalist.langTextNoPermission}}</li>
-            <li class="list-group-item" ng-if="datalist.loading === false && datalist.accessGranted === true" ng-repeat="row in datalist.data" ng-include="'datalistElement.html'"></li>
-            <li class="list-group-item text-center" ng-if="datalist.loading === true"><i ng-include="'datalistElementLoadingIcon.html'"></i> {{datalist.langPleaseWait}}</li>
+            <li class="list-group-item" ng-if="datalist.errorOccured === false && datalist.accessGranted === false && datalist.authenticated === false">{{datalist.langTextNotLogged}}</li>
+            <li class="list-group-item" ng-if="datalist.errorOccured === false && datalist.accessGranted === false && datalist.authenticated === true">{{datalist.langTextNoPermission}}</li>
+            <li class="list-group-item" ng-if="datalist.errorOccured === false && datalist.loading === false && datalist.accessGranted === true && datalist.data.length > 0" ng-repeat="row in datalist.data" ng-include="'datalistElement.html'"></li>
+            <li class="list-group-item" ng-if="datalist.errorOccured === false && datalist.loading === false && datalist.accessGranted === true && datalist.data.length === 0" ng-include="'datalistElementEmpty.html'"></li>
+            <li class="list-group-item" ng-if="datalist.errorOccured === true" ng-include="'datalistElementError.html'"></li>
+
+            <li class="list-group-item text-center" ng-if="datalist.errorOccured === false && datalist.loading === true"><i ng-include="'datalistElementLoadingIcon.html'"></i> {{datalist.langPleaseWait}}</li>
         </ul>
     </div>
     <div class="datalist-simple" ng-if="datalist.simple === true">

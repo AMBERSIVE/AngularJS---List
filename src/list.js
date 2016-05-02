@@ -25,6 +25,7 @@
                 langSearchBtn:'Search',
                 langSearchPlaceholder:'Searchterm',
                 langNoEntries:'No entries avaiable',
+                langErrorData: 'Data could not be loaded.',
                 template:'src/views/ambersive.list.default.html',
                 entriesPerPage:10
             };
@@ -48,6 +49,7 @@
                         langSearchBtn:values.langSearchBtn,
                         langSearchPlaceholder:values.langSearchPlaceholder,
                         langNoEntries:values.langNoEntries,
+                        langErrorData:values.langErrorData,
                         entriesPerPage:values.entriesPerPage
                     };
                 }
@@ -164,6 +166,8 @@
                     datalist.data                   = [];
                     datalist.result                 = {};
                     datalist.loading                = true;
+                    datalist.errorOccured           = false;
+                    datalist.errorMessage           = '';
                     datalist.actionLoading          = false;
 
                     datalist.selectedItems          = [];
@@ -432,7 +436,8 @@
                             return;
                         }
 
-                        datalist.loading = true;
+                        datalist.loading        = true;
+                        datalist.errorOccured   = false;
 
                         if(datalist.api !== undefined){
                             api = DB(datalist.api);
@@ -449,12 +454,23 @@
 
                                     resultFn(result);
                                     datalist.data = datalist.result;
+
                                     deferred.resolve();
+
 
                                 },
                                 function(errorResult){
 
                                     datalist.data = [];
+
+                                    datalist.errorOccured = true;
+
+                                    if(errorResult !== null && errorResult.message !== undefined){
+                                        datalist.errorMessage = errorResult.message;
+                                    } else {
+                                        datalist.errorMessage = $datalistSettings.langErrorData;
+                                    }
+
                                     deferred.reject(errorResult);
 
                                 }
@@ -496,7 +512,28 @@
                         return deferred.promise;
                     };
 
+                    datalist.indexDBMapper = function(data){
 
+                        var db = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
+                        if(db){
+
+                            var request = db.open('Test',3);
+
+                            request.onerror = function(event) {
+                                console.log('Database error');
+                            };
+                            request.onsuccess = function(event) {
+                                console.log('Database success');
+                            };
+
+                        } else {
+
+                            console.log('No Database');
+
+                        }
+
+                    };
 
                     /***
                      * Refresh the data for this list

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AngularJS - AMBERSIVE Datalist Directive/Service</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../bower_components/SpinKit/css/spinkit.css" />
+    <link   href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="../bower_components/ambersive-router-ui-auth/build/auth.js"></script>
+    <script src="../bower_components/ambersive-db/build/db.js"></script>
+    <script src="../bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="../build/list.js"></script>
+    <script>
+
+
+        angular.module('app', ['ambersive.list','ambersive.routerui.auth','ui.router','ui.bootstrap'])
+        .run(function($log,$urlRouter){
+
+            $urlRouter.sync();
+            $urlRouter.listen();
+
+        })
+        .config(['$stateProvider','$urlRouterProvider','$dbSettingsProvider','$authenticationSettingsProvider','$windowProvider',
+            function ($stateProvider,$urlRouterProvider,$dbSettingsProvider,$authenticationSettingsProvider,$windowProvider) {
+
+                var protocol = $windowProvider.$get().location.protocol,
+                        host = $windowProvider.$get().location.host,
+                        path = $windowProvider.$get().location.pathname,
+                        base = protocol+'//'+host+path;
+
+                $dbSettingsProvider.setBaseUrl(base);
+
+                $authenticationSettingsProvider.setApiValue('baseUrl',base);
+                $authenticationSettingsProvider.setApiValue('url','data/responseUser.json');
+
+                $authenticationSettingsProvider.setValue('redirect401Route','app.error');
+                $authenticationSettingsProvider.setValue('redirect403Route','http://orf.at');
+                $authenticationSettingsProvider.setValue('redirect404Route','app.error');
+
+                $dbSettingsProvider.setBaseUrl('http://jsonplaceholder.typicode.com/');
+                $dbSettingsProvider.register('Demo',{'url':'posts',except:[]});
+
+                    $stateProvider
+                       .state('app', {
+                           abstract: true,
+                           data: {
+                                roles: []
+                           },
+                           views: {
+                               '': {
+                                   template: '<div ui-view="main"></div>'
+                               }
+                           }
+                       })
+                       .state('app.state1', {
+                            parent: 'app',
+                            url:'/state1',
+                            views: {
+                                'main@app': {
+                                    template: '<datalist></datalist>'
+                                }
+                            }
+                       })
+                       .state('app.error', {
+                           parent: 'app',
+                           url:'/error',
+                           data: {
+                           },
+                           views: {
+                               'main@app': {
+                                   template: '<div>error</div>'
+                               }
+                           }
+                       });
+
+
+                    $urlRouterProvider.otherwise('/state1');
+
+            }])
+           .controller('DemoController',
+                   function($scope,$log,$rootScope,Auth,$q,$timeout){
+
+                       $scope.settings = {
+                           search:true,
+                           actions:[
+                               {'label':'Delete',apiMethod:'delete',multiple:true,refresh:true,preFn:function(entries){
+                                   var deferred = $q.defer();
+
+                                   $timeout(function(){
+                                       console.log(entries);
+                                       deferred.resolve();
+                                   });
+
+                                   return deferred.promise;
+                               }},
+                               {
+                                   'label':'Say me the ID',
+                                   fn:function(id,row){
+                                       var deferred = $q.defer();
+
+                                       if(id !== undefined){
+                                           alert('This entry has the ID:'+id);
+                                           deferred.resolve();
+                                       }
+
+                                       return deferred.promise;
+                                   },
+                                   preFn:function(entries){
+                                       var deferred = $q.defer();
+
+                                       $timeout(function(){
+                                           console.log(entries);
+                                           deferred.reject();
+                                       });
+
+                                       return deferred.promise;
+                                   },
+                                   multiple:false,
+                                   permission:{
+                                       roles:['Admin']
+                                   }
+                               },
+                               {
+                                   'label':'Print',
+                                   fn:function(id,row){
+                                       var deferred = $q.defer();
+
+                                       if(id !== undefined){
+                                           window.print();
+                                           deferred.resolve();
+                                       }
+
+                                       return deferred.promise;
+                                   },
+                                   multiple:{
+                                       only:true,
+                                       show:true,
+                                       single:true
+                                   }
+                               }
+                           ]
+                       };
+
+                       $scope.settingsPermission = {
+                             search:true,
+                             permission:{
+                                 roles:['Admin']
+                             }
+                       };
+
+                       $scope.restObject  = 'data/response.json';
+                       $scope.restObject2 = {method:'get',url:'data/response.json'};
+
+                   }
+           );
+
+    </script>
+
+</head>
+<body ng-app="app" ng-controller="DemoController">
+
+    <div class="container">
+        <h1>List Directive/Service</h1>
+        <h2>Standard datalist</h2>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+                <h3>Datalist:</h3>
+                <datalist api="Demo" settings="settings"></datalist>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
