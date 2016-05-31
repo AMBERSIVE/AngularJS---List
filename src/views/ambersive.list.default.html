@@ -120,5 +120,5 @@
         <div class="datalist-item" ng-if="datalist.loading === false && datalist.accessGranted === true && datalist.subTemplate !== undefined" ng-repeat="row in datalist.data" ng-include="datalist.subTemplate"></div>
         <div class="text-center" ng-if="datalist.loading === true"><i ng-include="'datalistElementLoadingIcon.html'"></i> {{datalist.langPleaseWait}}</div>
     </div>
-    <uib-pager total-items="datalist.total" items-per-page="datalist.entriesPerPage" previous-text="{{datalist.langBtnPrevious}}" next-text="{{datalist.langBtnNext}}" ng-model="datalist.currentPage"></uib-pager>
+    <uib-pager ng-if="settings.pagination === true" total-items="datalist.total" items-per-page="datalist.entriesPerPage" previous-text="{{datalist.langBtnPrevious}}" next-text="{{datalist.langBtnNext}}" ng-model="datalist.currentPage"></uib-pager>
 </div>

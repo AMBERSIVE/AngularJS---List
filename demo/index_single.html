@@ -85,6 +85,7 @@
 
                        $scope.settings = {
                            search:true,
+                           pagination:false,
                            actions:[
                                {'label':'Delete',apiMethod:'delete',multiple:true,refresh:true,preFn:function(entries){
                                    var deferred = $q.defer();

@@ -192,7 +192,6 @@
                     datalist.authenticated          = DatalistSrv.isAuthenticated;
                     datalist.accessGranted          = true;
                     datalist.searchTerm             = '';
-
                     /**
                      * Get parameters
                      */
@@ -212,15 +211,35 @@
                         settings.search = false;
                     }
 
+                    if(settings.pagination === undefined){
+                        settings.pagination = true;
+                    }
+
                     $scope.$watch('datalist.currentPage', function() {
 
                         if(angular.isArray(datalist.result)){
 
-                            var start = (datalist.entriesPerPage*datalist.currentPage)-datalist.entriesPerPage,
-                                stop  = datalist.entriesPerPage,
-                                data  = angular.copy(datalist.result);
+                            console.log(settings);
 
-                            datalist.data = data.splice(start,stop);
+                            if(settings.pagination === true) {
+
+                                var start   = (datalist.entriesPerPage * datalist.currentPage) - datalist.entriesPerPage,
+                                    stop    = datalist.entriesPerPage,
+                                    data    = angular.copy(datalist.result);
+
+                                $timeout(function () {
+                                    datalist.data = data.splice(start, stop);
+                                    $scope.$apply();
+                                });
+
+                            } else {
+
+                                $timeout(function () {
+                                    datalist.data = angular.copy(datalist.result);
+                                    $scope.$apply();
+                                });
+
+                            }
 
                         }
                         else if(angular.isObject(datalist.result)){
@@ -454,9 +473,7 @@
 
                                     resultFn(result);
                                     datalist.data = datalist.result;
-
                                     deferred.resolve();
-
 
                                 },
                                 function(errorResult){
@@ -510,29 +527,6 @@
                         }
 
                         return deferred.promise;
-                    };
-
-                    datalist.indexDBMapper = function(data){
-
-                        var db = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-
-                        if(db){
-
-                            var request = db.open('Test',3);
-
-                            request.onerror = function(event) {
-                                console.log('Database error');
-                            };
-                            request.onsuccess = function(event) {
-                                console.log('Database success');
-                            };
-
-                        } else {
-
-                            console.log('No Database');
-
-                        }
-
                     };
 
                     /***
