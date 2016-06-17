@@ -1,7 +1,7 @@
 <script type="text/ng-template" id="datalistElement.html">
     <div class="row">
         <div class="col-xs-10">
-            <div class="radiobox" ng-if="datalist.actions.length > 0 && settings.radio === true">
+            <div class="radiobox" ng-if="settings.radio === true">
                 <label>
                     <input type="radio" ng-model="datalist.singleSelected" value="{{row.id}}"  ng-disabled="datalist.rowDisabled(row.id)">
                     <div ng-if="datalist.subTemplate === undefined">{{row.title}}</div>

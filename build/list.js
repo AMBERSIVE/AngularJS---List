@@ -980,7 +980,7 @@ angular.module('ambersive.list').run(['$templateCache', function($templateCache)
   $templateCache.put('src/views/ambersive.list.default.html',
     "<script type=text/ng-template id=datalistElement.html><div class=\"row\">\n" +
     "        <div class=\"col-xs-10\">\n" +
-    "            <div class=\"radiobox\" ng-if=\"datalist.actions.length > 0 && settings.radio === true\">\n" +
+    "            <div class=\"radiobox\" ng-if=\"settings.radio === true\">\n" +
     "                <label>\n" +
     "                    <input type=\"radio\" ng-model=\"datalist.singleSelected\" value=\"{{row.id}}\"  ng-disabled=\"datalist.rowDisabled(row.id)\">\n" +
     "                    <div ng-if=\"datalist.subTemplate === undefined\">{{row.title}}</div>\n" +
