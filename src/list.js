@@ -920,8 +920,7 @@
 
                     };
  
-                    datalist.init();
-
+                    datalist.init(); 
 
                     $scope.$watch('datalist.singleSelected',function(value){
 

@@ -920,7 +920,7 @@
 
                     };
  
-                    datalist.init();
+                    datalist.init(); 
 
 
                     $scope.$watch('datalist.singleSelected',function(value){
@@ -994,10 +994,10 @@ angular.module('ambersive.list').run(['$templateCache', function($templateCache)
     "                    <div ng-if=\"datalist.subTemplate !== undefined\" ng-include=\"datalist.subTemplate\"></div>\n" +
     "                </label>\n" +
     "            </div>\n" +
-    "            <div ng-if=\"(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate === undefined\">\n" +
+    "            <div ng-if=\"(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate === undefined && settings.radio !== true\">\n" +
     "                {{row.title}}\n" +
     "            </div>\n" +
-    "            <div ng-if=\"(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate !== undefined\" ng-include=\"datalist.subTemplate\"></div>\n" +
+    "            <div ng-if=\"(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate !== undefined  && settings.radio !== true\" ng-include=\"datalist.subTemplate\"></div>\n" +
     "        </div>\n" +
     "        <div class=\"col-xs-2\">\n" +
     "            <div class=\"pull-right\" ng-if=\"datalist.actions.length > 0\">\n" +

@@ -15,10 +15,10 @@
                     <div ng-if="datalist.subTemplate !== undefined" ng-include="datalist.subTemplate"></div>
                 </label>
             </div>
-            <div ng-if="(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate === undefined">
+            <div ng-if="(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate === undefined && settings.radio !== true">
                 {{row.title}}
             </div>
-            <div ng-if="(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate !== undefined" ng-include="datalist.subTemplate"></div>
+            <div ng-if="(datalist.actions.length === 0 || datalist.actions === undefined) && datalist.subTemplate !== undefined  && settings.radio !== true" ng-include="datalist.subTemplate"></div>
         </div>
         <div class="col-xs-2">
             <div class="pull-right" ng-if="datalist.actions.length > 0">
