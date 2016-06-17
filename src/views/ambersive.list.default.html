@@ -1,7 +1,14 @@
 <script type="text/ng-template" id="datalistElement.html">
     <div class="row">
         <div class="col-xs-10">
-            <div class="checkbox" ng-if="datalist.actions.length > 0">
+            <div class="radiobox" ng-if="datalist.actions.length > 0 && settings.radio === true">
+                <label>
+                    <input type="radio" ng-model="datalist.singleSelected" value="{{row.id}}"  ng-disabled="datalist.rowDisabled(row.id)">
+                    <div ng-if="datalist.subTemplate === undefined">{{row.title}}</div>
+                    <div ng-if="datalist.subTemplate !== undefined" ng-include="datalist.subTemplate"></div>
+                </label>
+            </div>
+            <div class="checkbox" ng-if="datalist.actions.length > 0 && settings.radio !== true">
                 <label>
                     <input type="checkbox" ng-model="row.isSelected" ng-click="datalist.toggleItem($event,row)" ng-disabled="datalist.rowDisabled(row.id)">
                     <div ng-if="datalist.subTemplate === undefined">{{row.title}}</div>
@@ -81,7 +88,7 @@
             </div>
             <div class="row">
                 <div class="col-xs-10">
-                    <div class="checkbox" ng-if="datalist.actions.length > 0">
+                    <div class="checkbox" ng-if="datalist.actions.length > 0 && settings.radio !== true">
                         <label>
                             <input type="checkbox" ng-model="datalist.allSelected" ng-click="datalist.selectAll($event)" ng-disabled="loading || datalist.actionLoading"> <span translate>{{datalist.langChooseAll}}</span>
                         </label>

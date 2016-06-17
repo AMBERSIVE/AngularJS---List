@@ -154,8 +154,8 @@
 
             directive.transclude = true;
 
-            directive.controller = ['$compile','$scope','$state','$element','$log','$timeout','$templateCache','$http','$q','$datalistSettings','DB','DatalistSrv',
-                function($compile,$scope,$state,$element,$log,$timeout,$templateCache,$http,$q,$datalistSettings,DB,DatalistSrv){
+            directive.controller = ['$compile','$scope','$rootScope','$state','$element','$log','$timeout','$templateCache','$http','$q','$datalistSettings','DB','DatalistSrv',
+                function($compile,$scope,$rootScope,$state,$element,$log,$timeout,$templateCache,$http,$q,$datalistSettings,DB,DatalistSrv){
 
                     var datalist            = this,
                         settings            = {};
@@ -218,8 +218,6 @@
                     $scope.$watch('datalist.currentPage', function() {
 
                         if(angular.isArray(datalist.result)){
-
-                            console.log(settings);
 
                             if(settings.pagination === true) {
 
@@ -923,6 +921,13 @@
                     };
  
                     datalist.init();
+
+
+                    $scope.$watch('datalist.singleSelected',function(value){
+
+                        $rootScope.$broadcast('$datalistSelectedValue',{value:value});
+
+                    });
 
                     /***
                      * Broadcasts
