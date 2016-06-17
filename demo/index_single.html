@@ -85,6 +85,9 @@
 
                        $scope.settings = {
                            radio:true,
+                           controlFilter:function(row){
+                                return (row.userId === 1)
+                           },
                            search:true,
                            pagination:false,
                            actions:[

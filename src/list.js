@@ -336,6 +336,30 @@
                         return false;
                     };
 
+                    /***
+                     * Function for checkbox and radiobox filtering
+                     * @param row
+                     * @returns {boolean}
+                     */
+
+                    datalist.controlFilter = function(row){
+
+                        var visible = false;
+
+                        if(settings.controlFilter === undefined){
+                            return true;
+                        }
+
+                        visible = settings.controlFilter(row);
+
+                        if(visible === undefined){
+                            visible = true;
+                        }
+
+                        return visible;
+
+                    };
+
                     datalist.startSearch = function () {
                         datalist.getData(null,datalist.searchTerm);
                     };
@@ -920,7 +944,7 @@
 
                     };
  
-                    datalist.init(); 
+                    datalist.init();
 
                     $scope.$watch('datalist.singleSelected',function(value){
 

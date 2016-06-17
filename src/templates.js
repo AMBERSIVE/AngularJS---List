@@ -6,14 +6,14 @@ angular.module('ambersive.list').run(['$templateCache', function($templateCache)
     "        <div class=\"col-xs-10\">\n" +
     "            <div class=\"radiobox\" ng-if=\"settings.radio === true\">\n" +
     "                <label>\n" +
-    "                    <input type=\"radio\" ng-model=\"datalist.singleSelected\" value=\"{{row.id}}\"  ng-disabled=\"datalist.rowDisabled(row.id)\">\n" +
+    "                    <input type=\"radio\" ng-model=\"datalist.singleSelected\" value=\"{{row.id}}\"  ng-disabled=\"datalist.rowDisabled(row.id)\" ng-if=\"datalist.controlFilter(row)\">\n" +
     "                    <div ng-if=\"datalist.subTemplate === undefined\">{{row.title}}</div>\n" +
     "                    <div ng-if=\"datalist.subTemplate !== undefined\" ng-include=\"datalist.subTemplate\"></div>\n" +
     "                </label>\n" +
     "            </div>\n" +
     "            <div class=\"checkbox\" ng-if=\"datalist.actions.length > 0 && settings.radio !== true\">\n" +
     "                <label>\n" +
-    "                    <input type=\"checkbox\" ng-model=\"row.isSelected\" ng-click=\"datalist.toggleItem($event,row)\" ng-disabled=\"datalist.rowDisabled(row.id)\">\n" +
+    "                    <input type=\"checkbox\" ng-model=\"row.isSelected\" ng-click=\"datalist.toggleItem($event,row)\" ng-disabled=\"datalist.rowDisabled(row.id)\" ng-if=\"datalist.controlFilter(row)\">\n" +
     "                    <div ng-if=\"datalist.subTemplate === undefined\">{{row.title}}</div>\n" +
     "                    <div ng-if=\"datalist.subTemplate !== undefined\" ng-include=\"datalist.subTemplate\"></div>\n" +
     "                </label>\n" +

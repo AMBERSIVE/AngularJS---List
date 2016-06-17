@@ -3,7 +3,7 @@
 An AngularJS (1.5) service for displaying data (json-format).
 
 ### Version
-0.0.3.10
+0.0.4.0
 
 ### Installation
 
