@@ -145,6 +145,24 @@
                                        show:true,
                                        single:true
                                    }
+                               },
+                               {
+                                   'label':'Refresh only list with id="test"',
+                                   fn:function(id,row){
+                                       var deferred = $q.defer();
+
+                                       $timeout(function(){
+                                           $rootScope.$broadcast('$updateListsSingle',{'id':'test'});
+                                           deferred.resolve();
+                                       });
+
+                                       return deferred.promise;
+                                   },
+                                   multiple:{
+                                       only:true,
+                                       show:true,
+                                       single:true
+                                   }
                                }
                            ]
                        };
@@ -173,6 +191,7 @@
         <div class="row">
             <div class="col-xs-12 col-sm-12">
                 <h3>Datalist:</h3>
+                <datalist api="Demo" id="test" api-method="get" settings="settings"></datalist>
                 <datalist api="Demo" api-method="get" settings="settings"></datalist>
             </div>
         </div>

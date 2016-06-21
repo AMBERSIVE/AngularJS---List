@@ -3,7 +3,7 @@
 An AngularJS (1.5) service for displaying data (json-format).
 
 ### Version
-0.0.4.0
+0.0.4.1
 
 ### Installation
 
@@ -33,6 +33,10 @@ The following example shows how to use the list-directive. As you can see the di
 
 ```
 ### Options (= attributes)
+
+#### id (String)
+
+If you use this attribute you can refresh a single list by make a broadcast eg. $rootScope.$broadcast('$updateListsSingle',{'id':'test'});
 
 #### api (String)
 

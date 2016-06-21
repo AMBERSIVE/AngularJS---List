@@ -147,7 +147,8 @@
                 api:'@',
                 apiMethod:'@',
                 settings:'=',
-                simple:'@'
+                simple:'@',
+                id:'@'
             };
 
             directive.replace = true;
@@ -966,6 +967,17 @@
 
                         datalist.getMenu();
                         datalist.getData();
+                    });
+
+                    $scope.$on('$updateListsSingle',function(event,args){
+                        
+                        if(args.id === $scope.id) {
+
+                            datalist.getMenu();
+                            datalist.getData();
+
+                        }
+
                     });
 
                 }
