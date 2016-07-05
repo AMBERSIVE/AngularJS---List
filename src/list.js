@@ -491,30 +491,45 @@
                                 apiData.search = searchTerm;
                             }
 
-                            api[datalist.apiMethod](apiData).then(
-                                function(result){
+                            api.$has(datalist.apiMethod).then(function(methodExists) {
 
-                                    resultFn(result);
-                                    datalist.data = datalist.result;
-                                    deferred.resolve();
+                                if(methodExists === true) {
 
-                                },
-                                function(errorResult){
+                                    api[datalist.apiMethod](apiData).then(
+                                        function (result) {
 
-                                    datalist.data = [];
+                                            resultFn(result);
+                                            datalist.data = datalist.result;
+                                            deferred.resolve();
 
-                                    datalist.errorOccured = true;
+                                        },
+                                        function (errorResult) {
 
-                                    if(errorResult !== null && errorResult.message !== undefined){
-                                        datalist.errorMessage = errorResult.message;
-                                    } else {
-                                        datalist.errorMessage = $datalistSettings.langErrorData;
-                                    }
+                                            datalist.data = [];
 
-                                    deferred.reject(errorResult);
+                                            datalist.errorOccured = true;
+
+                                            if (errorResult !== null && errorResult.message !== undefined) {
+                                                datalist.errorMessage = errorResult.message;
+                                            } else {
+                                                datalist.errorMessage = $datalistSettings.langErrorData;
+                                            }
+
+                                            deferred.reject(errorResult);
+
+                                        }
+                                    );
+
+                                } else {
+
+                                    datalist.data           = [];
+                                    datalist.errorOccured   = true;
+                                    datalist.errorMessage   = $datalistSettings.langErrorData;
+                                    deferred.reject({});
 
                                 }
-                            );
+
+                            });
 
                         }
                         else if (datalist.rest !== undefined){
