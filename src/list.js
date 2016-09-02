@@ -579,7 +579,6 @@
                         }
 
                         datalist.selectedItems = [];
-                        datalist.selectAll = false;
 
                         if(datalist.actionLoading === true){
                             return;
