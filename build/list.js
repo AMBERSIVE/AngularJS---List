@@ -489,6 +489,10 @@
 
                             if(searchTerm !== undefined && searchTerm !== ''){
                                 apiData.search = searchTerm;
+                            } else {
+
+                                delete apiData.search;
+
                             }
 
                             api.$has(datalist.apiMethod).then(function(methodExists) {
