@@ -218,7 +218,7 @@
 
                     $scope.$watch('datalist.currentPage', function() {
 
-                        if(angular.isArray(datalist.result)){
+                        if(angular.isArray(datalist.result) && datalist.result.length === datalist.total){
 
                             if(settings.pagination === true) {
 
@@ -435,7 +435,17 @@
 
                                 if(angular.isArray(data)){
                                     datalist.result         = data;
-                                    datalist.total          = data.length;
+
+                                    if(result.total !== undefined){
+
+                                        datalist.total = result.total;
+
+                                    } else {
+
+                                        datalist.total = data.length;
+
+                                    }
+
                                     datalist.loading        = false;
 
                                     $timeout(function(){

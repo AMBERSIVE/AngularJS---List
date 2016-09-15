@@ -40,8 +40,8 @@
                 $authenticationSettingsProvider.setValue('redirect403Route','http://orf.at');
                 $authenticationSettingsProvider.setValue('redirect404Route','app.error');
 
-                $dbSettingsProvider.setBaseUrl('http://jsonplaceholder.typicode.com/');
-                $dbSettingsProvider.register('Demo',{'url':'posts',except:[]});
+                $dbSettingsProvider.setBaseUrl('data');
+                $dbSettingsProvider.register('Demo',{'url':'responseUser.json',except:[]});
 
                     $stateProvider
                        .state('app', {
@@ -89,7 +89,7 @@
                                 return (row.userId === 1)
                            },
                            search:true,
-                           pagination:false,
+                           pagination:true,
                            actions:[
                                {'label':'Delete',apiMethod:'delete',multiple:true,refresh:true,preFn:function(entries){
                                    var deferred = $q.defer();
