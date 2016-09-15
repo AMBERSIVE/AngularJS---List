@@ -432,7 +432,7 @@
                                 }
 
                                 datalist.currentPage = page;
-
+ 
                                 if(angular.isArray(data)){
                                     datalist.result         = data;
 
