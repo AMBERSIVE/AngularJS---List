@@ -457,6 +457,10 @@
 
                                     datalist.total = data.length;
 
+                                    if(angular.isDefined(result.per_page) === true){
+                                        datalist.entriesPerPage = parseInt(result.per_page);
+                                    }
+
                                     if(result.total !== undefined) {
                                         datalist.total = data.total;
                                     }
