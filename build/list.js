@@ -448,7 +448,7 @@
 
                                     if(angular.isDefined(result.per_page) === true){
                                         datalist.entriesPerPage = parseInt(result.per_page);
-                                    }
+                                    } 
 
                                     datalist.loading        = false;
 
