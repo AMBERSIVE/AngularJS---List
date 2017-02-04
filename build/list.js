@@ -146,6 +146,7 @@
                 rest:'=',
                 api:'@',
                 apiMethod:'@',
+                apiParams:'=',
                 settings:'=',
                 simple:'@',
                 id:'@'
@@ -485,6 +486,9 @@
                                 deferred.resolve();
                             };
 
+                        var restObj         = {};
+                        var params          = {};
+
                         if(page === undefined || page === 0 || page === null){
                             page = 1;
                         }
@@ -500,6 +504,7 @@
                         datalist.errorOccured   = false;
 
                         if(datalist.api !== undefined){
+
                             api = DB(datalist.api);
                             
                             apiData = $state.params;
@@ -511,6 +516,10 @@
 
                                 delete apiData.search;
 
+                            }
+
+                            if(angular.isDefined($scope.apiParams)){
+                                apiData = angular.extend(apiData,$scope.apiParams);
                             }
 
                             api.$has(datalist.apiMethod).then(function(methodExists) {
@@ -564,20 +573,43 @@
 
                             if(angular.isString(datalist.rest)){
 
-                                $http.get(datalist.rest+restExtention, {}).then(function successCallback(response) {
-                                    resultFn(response.data);
-                                }, function errorCallback(response) {
-                                    $log.warn('aambersive.list: $http get error (rest)');
-                                    deferred.resolve();
-                                });
+                                restObj = {
+                                    url:    datalist.rest+restExtention,
+                                    params: {},
+                                    method:'get'
+                                };
+
+                                if(angular.isDefined($scope.apiParams)){
+                                    restObj.params = $scope.apiParams;
+                                }
+
+                                $http(restObj)
+                                    .success(function(response,status,headers,config){
+                                        resultFn(response.data);
+                                    })
+                                    .error(function(data,status,headers,config){
+                                        $log.warn('ambersive.list: $http get error (rest)');
+                                        deferred.reject(data,headers);
+                                    });
 
                             }
                             else if(angular.isObject(datalist.rest)){
+
+                                if(angular.isDefined($scope.apiParams)){
+
+                                    if(angular.isDefined(datalist.rest.params) === false){
+                                        datalist.rest.params = $scope.apiParams;
+                                    }
+                                    else {
+                                        datalist.rest.params = angular.extend(datalist.rest.params,$scope.apiParams);
+                                    }
+                                }
+
                                 $http(datalist.rest+restExtention).then(function successCallback(response) {
                                     resultFn(response.data);
                                 }, function errorCallback(response) {
                                     $log.warn('aambersive.list: $http get error (rest)');
-                                    deferred.resolve();
+                                    deferred.reject(data,headers);
                                 });
                             }
 

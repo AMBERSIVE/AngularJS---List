@@ -177,6 +177,10 @@
                        $scope.restObject  = 'data/response.json';
                        $scope.restObject2 = {method:'get',url:'data/response.json'};
 
+                       $scope.params      = {
+                            'test':true
+                       };
+
                    }
            );
 
@@ -191,7 +195,9 @@
         <div class="row">
             <div class="col-xs-12 col-sm-12">
                 <h3>Datalist:</h3>
-                <datalist api="Demo" id="test" api-method="get" settings="settings"></datalist>
+                <datalist api="Demo" id="test" api-method="get" api-params="params" settings="settings"></datalist>
+                <h3>Datalist - REST:</h3>
+                <datalist rest="restObject" api-params="params" settings="settings"></datalist>
             </div>
         </div>
     </div>
