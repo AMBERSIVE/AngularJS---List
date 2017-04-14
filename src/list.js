@@ -1048,6 +1048,22 @@
 
                     });
 
+                    datalist.timeoutEvent = null;
+
+                    $scope.$watch('datalist.searchTerm', function(newValue, oldValue) {
+
+                        if(angular.isUndefined(datalist.searchTerm) || newValue === oldValue){
+                            return;
+                        }
+
+                        if (datalist.timeoutEvent) {$timeout.cancel(datalist.timeoutEvent);}
+
+                        datalist.timeoutEvent = $timeout(function() {
+                            datalist.startSearch();
+                        }, 500);
+
+                    },true);
+
                 }
             ];
 
